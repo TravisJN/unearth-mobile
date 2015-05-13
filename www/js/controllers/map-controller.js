@@ -4,7 +4,7 @@ angular.module('unearth.mapController', [])
       latitude: null,
       longitude: null
     };
-    var coordinateObjectCopy = {};
+    var coordinateArray = [];
     var sendWaypointsObject = {waypoints: []};
     var allWaypoints = [];
 
@@ -22,24 +22,27 @@ angular.module('unearth.mapController', [])
     var map = L.mapbox.map('map', mapboxLogin);
 
     var dataSent = false;
-
+    var accuracy;
     // Watches GPS position and POST waypoints to database every time position updates
     navigator.geolocation.watchPosition(function(position) {
-      if(coordinateObject.latitude !== position.coords.latitude && coordinateObject.longitude !== position.coords.longitude) {
-        coordinateObject.latitude = position.coords.latitude;
-        coordinateObject.longitude = position.coords.longitude;
-        coordinateObjectCopy = angular.copy(coordinateObject);
-        sendWaypointsObject.waypoints.push(coordinateObjectCopy);
-      }
+      accuracy = position.coords.accuracy;
+      //if(accuracy < 10) {
+        coordinateArray.push(position.coords.latitude);
+        coordinateArray.push(position.coords.longitude);
+        sendWaypointsObject.waypoints.push(coordinateArray.slice());
+        coordinateArray = [];
+      //}
 
       // Prevents transmission of empty waypoint data to server
 
-      if(dataSent === false && sendWaypointsObject.waypoints.length > 0) {
-        console.log('sendWaypointsObject: ', sendWaypointsObject);
-        Waypoints.sendWaypoints(sendWaypointsObject, function() {
-          dataSent = true;
-        });
-      }
+      $interval(function() {
+        if(dataSent === false && sendWaypointsObject.waypoints.length > 0) {
+          console.log('sendWaypointsObject: ', sendWaypointsObject);
+          Waypoints.sendWaypoints(sendWaypointsObject, function() {
+            dataSent = true;
+          });
+        }
+      }, 8000);
 
       if(dataSent === true) {
         sendWaypointsObject.waypoints = [];
@@ -47,23 +50,22 @@ angular.module('unearth.mapController', [])
       }
     }, function(error){console.log(error)}, {maximumAge: 60000, timeout: 10000, enableHighAccuracy: true});
 
-      var onePoint;
-      $interval(function() {
+    var getInterval = $interval(function() {
         // GET waypoints array from server on app load and display fog overlay
         Waypoints.getWaypoints(function(waypointData) {
-          console.log('waypointData: ', waypointData);
-          // waypointData is an object with an array of waypoint objects
-          // Loops through waypoints array and parses into format that can be read by fog overlay function
-          for(var i = 0; i < waypointData.waypoints.length; i++) {
-            onePoint = [];
-            onePoint.push(waypointData.waypoints[i].latitude);
-            onePoint.push(waypointData.waypoints[i].longitude);
-            allWaypoints.push(onePoint);
+          console.log('waypointData: ', waypointData, '  Accuracy: ', accuracy);
+          if(waypointData.waypoints.length > 0) {
+            map.removeLayer(layer);
+            // Creates fog layer with user's waypoints as transparent "holes" in the fog
+            layer.setData(waypointData.waypoints);
+            map.addLayer(layer);
           }
-          map.removeLayer(layer);
-          // Creates fog layer with user's waypoints as transparent "holes" in the fog
-          layer.setData(allWaypoints);
-          map.addLayer(layer);
         });
-      }, 30000);    // Makes GET request for waypoints every 30 seconds
+      }, 10000);    // Makes GET request for waypoints every 30 seconds
+
+    //getInterval();
+
+      $scope.$on("$destroy", function (event) {
+        $interval.cancel(getInterval);
+      });
   });

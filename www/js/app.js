@@ -70,6 +70,7 @@ angular.module('unearth', ['ionic', 'ngCordova', 'angular-jwt', 'unearth.mapCont
     })
 
     .state('tab.map', {
+      cache: false,
       url: '/map',
       data: {
         requireLogin: true

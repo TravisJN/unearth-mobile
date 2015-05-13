@@ -3,7 +3,7 @@ angular.module('unearth.services', [])
     var login = function(email, password) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/login',
+        url: 'http://162.243.134.216:3000/login',  // 162.243.134.216
         processData: false,
         data: {
           'email': email,
