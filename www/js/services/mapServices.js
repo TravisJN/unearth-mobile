@@ -99,7 +99,7 @@ angular.module('unearth.mapServices', [])
       zoomLevel = 12;
 
       layer = L.TileLayer.maskCanvas({
-        radius: 25,               // Radius in pixels or in meters of transparent circles (see useAbsoluteRadius)
+        radius: 100,               // Radius in pixels or in meters of transparent circles (see useAbsoluteRadius)
         useAbsoluteRadius: true,  // True: r in meters, false: r in pixels
         color: '#00000',          // The color of the fog layer
         opacity: 0.8,             // Opacity of the fog area
