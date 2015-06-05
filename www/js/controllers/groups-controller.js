@@ -27,10 +27,9 @@ angular.module('unearth.groupsController', [])
       // ]
 
     Group.getGroups(function(groupsData) {
-      console.log("groupsData: ", groupsData);
       // Sets the groupsData variable to the returned groups data to update the pending requests badge
       $scope.groupsData = groupsData.groups;
-
+      console.log("groupsData: ", groupsData);
       // Saves the group data from the server to the Modal factory to be accessed by the modal
       Modal.saveGroupsData(groupsData);
     });
@@ -67,7 +66,7 @@ angular.module('unearth.groupsController', [])
             window.localStorage.setItem('expeditions', JSON.stringify(expeditions));
 
             // DEBUG: Need to receive group id from response.
-            window.localStorage.setItem('currentExpedition', JSON.stringify(group.group_id));
+            window.localStorage.setItem('currentExpedition', JSON.stringify(group.id));
           }
           $state.go('tab.groups');
         }
@@ -80,36 +79,16 @@ angular.module('unearth.groupsController', [])
       $state.go('tab.map');
     };
 
-    $scope.acceptInvite = function(group) {
-      Group.groupJoin('accept', group.group_id, function(group) {
+    $scope.sendInvite = function(group) {
+      console.log(group);
+      Group.groupInvite(email, group.group_id, function() {
         if(error) {
-          console.log('didn\'t work!');
+          console.log('did\'t work!');
         } else{
-          alert('accepted invite into: ' + group.name);
-          window.localStorage.setItem('currentExpedition', group.group_id);
+          alert('inviting a friend to: ' + group.name + '!');
         }
       });
     };
-
-    $scope.declineInvite = function(group) {
-      Group.groupJoin('decline', group.group_id, function() {
-        if(error) {
-          console.log('didn\'t work!');
-        } else{
-          alert('declined invite into: ' + group.name);
-        }
-      });
-    };
-
-
-    //DEBUG: Modals need to be made once and then cleared out after each use.
-    $scope.inviteModal = function(group) {
-      Modal.setInviteData({group: group.group_id});
-      //Modal service needs group to be saved to Modaldata
-      Modal.createInviteModal('templates/invite-modal.html');
-    };
-
-    // DEBUG: currently this just sends to server. Modal needs to populate data then call this once submitted.
 
     $scope.leaveGroup = function(group) {
       if(confirm('You sure?  You can\'t rejoin an expedition without someone sending you an invite.')){
@@ -128,7 +107,7 @@ angular.module('unearth.groupsController', [])
 
     $scope.showPendingRequests = function() {
       Modal.createPendingModal();
-    };
+    }
   });
 
 

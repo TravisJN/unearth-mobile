@@ -4,7 +4,7 @@ angular.module('unearth.httpServices', [])
     var login = function(email, password) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/login',
+        url: 'http://localhost:3000/login',
         processData: false,
         data: {
           email: email,
@@ -25,7 +25,7 @@ angular.module('unearth.httpServices', [])
     var signUp = function(email, password, username) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/signup',
+        url: 'http://localhost:3000/signup',
         processData: false,
         data: {
           name: username,
@@ -55,7 +55,7 @@ angular.module('unearth.httpServices', [])
     var getMarkers = function() {
       return $http({
         method: 'GET',
-        url: 'http://162.243.134.216:3000/marker',
+        url: 'http://localhost:3000/marker',
         processData: false,
         header: {'Content-Type':'application/JSON'}
       })
@@ -71,7 +71,7 @@ angular.module('unearth.httpServices', [])
     var postMarkerImage = function(fd, callback) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/marker/image',
+        url: 'http://localhost:3000/marker/image',
         processData: false,
         data: fd,
         transformRequest:angular.identity,
@@ -93,7 +93,7 @@ angular.module('unearth.httpServices', [])
     var postMarkers = function(marker) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/marker',
+        url: 'http://localhost:3000/marker',
         data: {
           "markers": [marker]
         },
@@ -120,7 +120,7 @@ angular.module('unearth.httpServices', [])
     var getWaypoints = function(callback) {
       return $http({
         method: 'GET',
-        url: 'http://162.243.134.216:3000/waypoints',
+        url: 'http://localhost:3000/waypoints',
         processData: false,
         headers: {'Content-Type':'application/JSON'}
       })
@@ -133,7 +133,7 @@ angular.module('unearth.httpServices', [])
       console.log('waypoints sent: ', waypoints);
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/waypoints',
+        url: 'http://localhost:3000/waypoints',
         processData: false,
         data: waypoints,
         headers: {'Content-Type':'application/JSON'}
@@ -150,11 +150,11 @@ angular.module('unearth.httpServices', [])
   })
 
   .factory('Group', function($http) {
-
     var getGroupWaypoints = function(groupId, callback) {
+    console.log('inside group http');
       return $http({
         method: 'GET',
-        url: 'http://162.243.134.216:3000/group/waypoints',
+        url: 'http://localhost:3000/group/waypoints',
         processData: false,
         headers: {
           'Content-Type': 'application/JSON',
@@ -162,6 +162,7 @@ angular.module('unearth.httpServices', [])
         }
       })
       .then(function(response) {
+        console.log(response);
         callback(response.data);
       });
     };
@@ -169,7 +170,7 @@ angular.module('unearth.httpServices', [])
     var getGroups = function(callback) {
       return $http({
         method: 'GET',
-        url: 'http://162.243.134.216:3000/group',
+        url: 'http://localhost:3000/group',
         processData: false,
         headers: {'Content-Type':'application/JSON'}
       })
@@ -182,7 +183,7 @@ angular.module('unearth.httpServices', [])
     var groupCreate = function(groupName, groupDescription, callback) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/group/create',
+        url: 'http://localhost:3000/group/create',
         processData: false,
         data: {
           groupName: groupName,
@@ -199,7 +200,7 @@ angular.module('unearth.httpServices', [])
     var groupInvite = function(email, groupId, callback) {
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/group/invite',
+        url: 'http://localhost:3000/group/invite',
         processData: false,
         data: {
           email: email,
@@ -219,7 +220,7 @@ angular.module('unearth.httpServices', [])
     var getInvites = function(callback) {
       return $http({
         method: 'GET',
-        url: 'http://162.243.134.216:3000/group/invites',
+        url: 'http://localhost:3000/group/invites',
         processData: false,
         headers: {'Content-Type':'application/JSON'}
       })
@@ -232,7 +233,7 @@ angular.module('unearth.httpServices', [])
       console.log(groupId);
       return $http({
         method: 'POST',
-        url: 'http://162.243.134.216:3000/group/' + choice,
+        url: 'http://localhost:3000/group/' + choice,
         processData: false,
         data: {
           groupId: groupId

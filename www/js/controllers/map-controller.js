@@ -25,7 +25,7 @@ angular.module('unearth.mapController', [])
 
     var storeGroupWaypoints = function(callback) {
       currentExpedition = window.localStorage.getItem('currentExpedition');
-
+      console.log('inside storeGroupWaypoints');
       Group.getGroupWaypoints(currentExpedition,
 
         function(group) {

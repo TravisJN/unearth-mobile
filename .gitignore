@@ -4,6 +4,7 @@ config.js
 npm-debug.log
 platforms/
 plugins/
+.idea/
 
 __MACOSX
 .DS_Store

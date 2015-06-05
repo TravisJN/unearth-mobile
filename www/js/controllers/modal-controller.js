@@ -1,59 +1,29 @@
+
 angular.module('unearth.modalController', [])
-  .controller('ModalController', function($scope, RenderMap, MarkersHTTP, Modal, Group) {
+  .controller('ModalController', function($scope, RenderMap, Modal, Group) {
     $scope.contact = {
-      name: '',
+      title: '',
       description: ''
     };
 
     $scope.groupsData = Modal.groupsData();
+    // console.log("$scope.groupsData: ", $scope.groupsData);
 
-    $scope.closePending = function() {
-      Modal.closePending();
-    };
-
-    $scope.clearError = function(markerForm) {
-      markerForm.$submitted = false;
-    };
-
-    $scope.submitMarker = function() {
-      var fd = new FormData();
-      fd.append('file', $('.image')[0].files[0], 'image');
-
-      var createMarker = function(imageData){
-        RenderMap.createMarker($scope.contact.title, $scope.contact.description, imageData);
-        $scope.contact.title = '';
-        $scope.contact.description = '';
-      };
-
-      if ($('.image')[0].files[0]) {
-        MarkersHTTP.postMarkerImage(fd, function(response) {
-          createMarker(response.data.image_url);
-        });
-      } else {
-        createMarker('');
-      }
-    };
-
-    $scope.sendInvite = function(email) {
-      Modal.setInviteData({email: email});
-      Modal.closeInviteModal();
-    };
 
     Group.getInvites(function(pendingGroups) {
-      if(pendingGroups.groups.length > 0){
+      console.log(pendingGroups);
+      if(pendingGroups.groups.length > 0) {
         $scope.numInvites = pendingGroups.groups[0].outstandingInvites.length;
         $scope.pendingGroups = [];
         for (var i = 0; i < $scope.numInvites; i++) {
           $scope.pendingGroups.push(pendingGroups.groups[0].outstandingInvites[i][1][0]);
-          $scope.pendingGroups[$scope.pendingGroups.length - 1].group_id = pendingGroups.groups[0].outstandingInvites[i][0].group_id;
         }
       }
     });
 
     $scope.acceptInvite = function(group) {
-
-      Group.groupJoin('accept', group.group_id, function(response) {
-        if(response) {
+      Group.groupJoin('accept', group.group_id, function(group) {
+        if(group) {
           alert('accepted invite into: ' + group.name);
           window.localStorage.setItem('currentExpedition', group.group_id);
         } else{
@@ -66,28 +36,20 @@ angular.module('unearth.modalController', [])
 
     $scope.declineInvite = function(group) {
       Group.groupJoin('deny', group.group_id, function(response) {
-        if(!response) {
+        if(response) {
+          alert('declined invite into: ' + group.name);
+          console.log(response);
+        } else{
           console.log('didn\'t work!');
         }
       });
 
       Modal.closePending();
     };
-  })
 
-  .directive('validFile', function () {
-    return {
-      require: 'ngModel',
-      link: function ($scope, $el, attrs, ngModel) {
-        ngModel.$render = function () {
-          ngModel.$setViewValue($el.val());
-        };
-      $el.bind('change', function () {
-        $scope.$apply(function () {
-          $scope.imageuploaded = $('.image')[0].files[0];
-          ngModel.$render();
-          });
-        });
-      }
-    };
+    $scope.closeModal = function() {
+      RenderMap.createMarker($scope.contact.title, $scope.contact.description);
+      $scope.contact.title = '';
+      $scope.contact.description = '';
+    }
   });
